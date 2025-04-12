@@ -1,6 +1,7 @@
 import streamlit as st
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
+import pandas as pd
 
 # Page configuration
 st.set_page_config(page_title="Amazon Review Insight", layout="wide")
@@ -28,13 +29,33 @@ except Exception as e:
 # Sidebar
 with st.sidebar:
     st.image("https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg", width=150)
-    category = st.selectbox("Select Product Category", ["All", "Ebook Readers", "Batteries", "Accessories", "Non-electronics"])
+    category = st.selectbox("Select Product Category", ["All", "Fire & Amazon Tablets", "Smart Home & Entertainment Devices", "eBook Readers & Accessories"])
     min_rating = st.slider("Minimum Star Rating", 1, 5, 3)
 
-# Tabs
-tab1, tab2 = st.tabs(["📊 Sentiment Classifier", "📝 Review Summary"])
+# Example product categories and clusters
+# Let's assume you already have the clusters defined and ready, here is a simple list of categories
+clusters = ["Fire & Amazon Tablets", "Smart Home & Entertainment Devices", "eBook Readers & Accessories"]
+
+# For the example, let's define some sample summaries for each cluster
+cluster_summaries = {
+    "Fire & Amazon Tablets": "Top Products: Expanding Accordion File Folder, AmazonBasics USB Cable.",
+    "Smart Home & Entertainment Devices": "Top Products: Amazon Echo, Fire TV Stick.",
+    "eBook Readers & Accessories": "Top Products: Kindle Paperwhite, Kindle Accessories."
+}
+
+# DataFrame Example - this would be your actual review dataset
+data = {
+    'meta_category': ['Fire & Amazon Tablets', 'Fire & Amazon Tablets', 'Smart Home & Entertainment Devices', 
+                      'Smart Home & Entertainment Devices', 'eBook Readers & Accessories', 'eBook Readers & Accessories'],
+    'product': ['Kindle Fire HD', 'Fire Stick', 'Amazon Echo', 'Fire TV Stick', 'Kindle Paperwhite', 'Kindle Case'],
+    'review': ['Excellent tablet!', 'Great streaming device!', 'Amazing smart home assistant!', 'Super easy to use!', 'Great for reading!', 'Good protection for Kindle!'],
+    'rating': [5, 4, 5, 4, 5, 4]
+}
+df = pd.DataFrame(data)
 
 # --- Sentiment Classifier Tab ---
+tab1, tab2 = st.tabs(["📊 Sentiment Classifier", "📝 Review Summary"])
+
 with tab1:
     st.subheader("🗣️ Enter a Product Review")
     review = st.text_area("Paste the review text below:", height=150)
@@ -63,9 +84,24 @@ with tab1:
 with tab2:
     st.subheader("📦 Category-Based Review Summary")
     st.info(f"Selected Category: **{category}** | Minimum Rating: **{min_rating} stars**")
-    st.write("📌 This section will show a summary of the top-rated products, common complaints, and the lowest-rated item (coming soon).")
+    
+    if category != "All":
+        st.write(f"📌 **{category}** - Showing reviews with rating **{min_rating}** stars and above.")
+        st.write("Here's a quick summary of the top-rated products and some key insights:")
 
-    # Example product image and sample summary
+        # Filter reviews based on selected category and minimum rating
+        df_filtered = df[(df['meta_category'] == category) & (df['rating'] >= min_rating)]
+        st.write(df_filtered[['product', 'review', 'rating']])
+
+        # Example of a cluster summary that matches the selected category
+        if category in cluster_summaries:
+            st.markdown(f"**Cluster Summary for {category}:**")
+            st.write(cluster_summaries[category])
+
+    else:
+        st.write("Please select a category to view the summary.")
+
+    # Example of review display
     st.image("https://images-na.ssl-images-amazon.com/images/I/61v2zDdGpaL._AC_SL1000_.jpg", width=200)
     st.markdown("""
     **Top Product 1:** Kindle Paperwhite  

@@ -9,3 +9,7 @@ This project focuses on analyzing and classifying customer reviews from Amazon. 
 - [Download clustered_reviews.csv.gz from Google Drive](https://drive.google.com/your-link-here)
 
 > The file has been compressed to reduce its size and bypass GitHub's file size limits.
+
+
+### Deployment:
+You can try the deployed application here: [Amazon Review Sentiment & Clustering](http://51.20.87.52:8501)
